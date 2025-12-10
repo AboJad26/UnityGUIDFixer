@@ -19,14 +19,18 @@ python GUIDFixer.py
 
 ### 2. GUIDFixerLegacy.py
 A wrapper around the legacy C++ tool (`ReplaceGUIDwithCorrectOne.exe`).
-- **Usage**:
+- **Features**:
   - Automatically feeds paths to the legacy tool.
+  - **Visible CMD Window**: Shows the legacy tool's output in real-time.
+  - **Auto-Save Settings**: Remembers your last used paths in `settings.json`.
   - Requires `ReplaceGUIDwithCorrectOne.exe` to be built and present.
 
 ### 3. ReplaceGUIDwithCorrectOne (C++ Source)
 The original legacy tool source code.
-**IMPORTANT**: The original binary might crash with code `3221226505` on some meta files.
-**FIX**: This repository contains a patched `ReplaceGUIDwithCorrectOne.cpp` file. 
+**IMPORTANT**: The original binary might crash with code `3221226505` (0xC0000409) on some meta files.
+**FIX**: This repository contains a patched `ReplaceGUIDwithCorrectOne.cpp` file that:
+- Skips invalid/short meta files to prevent crashes.
+- Checks both Source and Destination files for validity.
 **You must recompile this tool** using Visual Studio to use `GUIDFixerLegacy.py` safely.
 
 ## How to Compile (Legacy Tool)

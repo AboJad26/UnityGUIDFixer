@@ -59,6 +59,11 @@ int main()
             std::ifstream ifs2(entry2.path());
             //get file contents
             std::string contentsOfCorrectGUID((std::istreambuf_iterator<char>(ifs2)), (std::istreambuf_iterator<char>()));
+            
+            if (contentsOfCorrectGUID.length() < 60) {
+                continue;
+            }
+
             std::string CorrectGuid = contentsOfCorrectGUID.substr(27, 32);
             for (const auto& ProjectAssetFile : std::filesystem::recursive_directory_iterator(UnityProjectPath))
             {

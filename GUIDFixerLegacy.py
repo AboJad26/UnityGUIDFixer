@@ -12,6 +12,10 @@ class GUIDFixerApp:
         self.root = root
         self.root.title("Unity GUID Fixer (Legacy Tool Wrapper)")
         self.root.geometry("1000x800")
+        
+        # Load settings
+        self.settings_file = "settings.json"
+        self.settings = self.load_settings()
 
         # Unity Project Path
         self.lbl_unity = tk.Label(root, text="Unity Project Assets Path (Target Project):")
@@ -23,10 +27,13 @@ class GUIDFixerApp:
         self.entry_unity = tk.Entry(self.frame_unity)
         self.entry_unity.pack(side="left", fill="x", expand=True)
         
-        # Default to current project Assets folder
-        default_assets_path = os.path.join(os.getcwd(), "Assets")
-        if os.path.exists(default_assets_path):
-            self.entry_unity.insert(0, default_assets_path)
+        # Default to current project Assets folder or loaded setting
+        if self.settings.get("unity_path"):
+            self.entry_unity.insert(0, self.settings.get("unity_path"))
+        else:
+            default_assets_path = os.path.join(os.getcwd(), "Assets")
+            if os.path.exists(default_assets_path):
+                self.entry_unity.insert(0, default_assets_path)
         
         self.btn_unity = tk.Button(self.frame_unity, text="Browse", command=self.browse_unity)
         self.btn_unity.pack(side="right", padx=(5, 0))
@@ -46,12 +53,15 @@ class GUIDFixerApp:
         self.btn_source = tk.Button(self.frame_source, text="Browse", command=self.browse_source)
         self.btn_source.pack(side="right", padx=(5, 0))
         
-        # Try to find PackageCache as default source
-        default_pkg_cache = os.path.join(os.path.dirname(os.getcwd()), "Library", "PackageCache")
-        if not os.path.exists(default_pkg_cache):
-             default_pkg_cache = os.path.join(os.getcwd(), "Library", "PackageCache")
-        if os.path.exists(default_pkg_cache):
-            self.entry_source.insert(0, default_pkg_cache)
+        if self.settings.get("source_path"):
+             self.entry_source.insert(0, self.settings.get("source_path"))
+        else:
+            # Try to find PackageCache as default source
+            default_pkg_cache = os.path.join(os.path.dirname(os.getcwd()), "Library", "PackageCache")
+            if not os.path.exists(default_pkg_cache):
+                 default_pkg_cache = os.path.join(os.getcwd(), "Library", "PackageCache")
+            if os.path.exists(default_pkg_cache):
+                self.entry_source.insert(0, default_pkg_cache)
 
         # Decompiled / Old Scripts Path
         self.lbl_old = tk.Label(root, text="Decompiled / Old Scripts Path (Target to Identify):")
@@ -65,6 +75,12 @@ class GUIDFixerApp:
         
         self.btn_old = tk.Button(self.frame_old, text="Browse", command=self.browse_old)
         self.btn_old.pack(side="right", padx=(5, 0))
+
+        if self.settings.get("old_path"):
+            self.entry_old.insert(0, self.settings.get("old_path"))
+            
+        # Bind Close Event
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
 
         # Action Buttons
@@ -460,6 +476,31 @@ if %errorlevel% neq 0 (
         self.log("All tasks completed.")
         self.btn_run.config(state='normal')
         messagebox.showinfo("Done", "Legacy Tool execution finished.")
+
+    def load_settings(self):
+        if os.path.exists(self.settings_file):
+            try:
+                with open(self.settings_file, 'r') as f:
+                    return json.load(f)
+            except:
+                pass
+        return {}
+
+    def save_settings(self):
+        settings = {
+            "unity_path": self.entry_unity.get(),
+            "source_path": self.entry_source.get(),
+            "old_path": self.entry_old.get()
+        }
+        try:
+            with open(self.settings_file, 'w') as f:
+                json.dump(settings, f, indent=4)
+        except Exception as e:
+            print(f"Failed to save settings: {e}")
+
+    def on_close(self):
+        self.save_settings()
+        self.root.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
