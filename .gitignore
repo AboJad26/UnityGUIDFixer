@@ -1,0 +1,24 @@
+# Visual Studio temporary files
+*.obj
+*.tlog
+*.log
+*.idb
+*.pdb
+*.ilk
+*.ipdb
+*.iobj
+*.lastbuildstate
+*.recipe
+*.pch
+*.suo
+*.user
+*.db
+*.opendb
+.vs/
+x64/Debug/
+x64/Release/*.pdb
+x64/Release/*.iobj
+x64/Release/*.ipdb
+
+# Keep the Release Executable
+!x64/Release/ReplaceGUIDwithCorrectOne.exe
