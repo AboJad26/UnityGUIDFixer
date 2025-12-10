@@ -42,11 +42,11 @@ int main()
         std::ifstream ifs(entry.path());
         //get file contents
         std::string contentsOfWrongGUID((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-        
+
         // CRASH FIX: Check length before substr
         if (contentsOfWrongGUID.length() < 60) {
-            std::cout << "Skipping small/invalid meta file: " << entry.path().filename().string() << "\n";
-            continue;
+             // std::cout << "Skipping small/invalid meta file: " << entry.path().filename().string() << "\n";
+             continue;
         }
 
         std::string incorrectGuid = contentsOfWrongGUID.substr(27, 32);
@@ -59,12 +59,6 @@ int main()
             std::ifstream ifs2(entry2.path());
             //get file contents
             std::string contentsOfCorrectGUID((std::istreambuf_iterator<char>(ifs2)), (std::istreambuf_iterator<char>()));
-            
-            // CRASH FIX: Check length before substr
-            if (contentsOfCorrectGUID.length() < 60) {
-                 continue;
-            }
-
             std::string CorrectGuid = contentsOfCorrectGUID.substr(27, 32);
             for (const auto& ProjectAssetFile : std::filesystem::recursive_directory_iterator(UnityProjectPath))
             {
