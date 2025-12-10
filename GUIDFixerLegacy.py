@@ -408,24 +408,38 @@ class GUIDFixerApp:
             # 2. Correct GUIDs Path (New)
             # 3. Unity Project Assets Path
             
-            # Ensure paths use correct separators (Windows)
-            input_str = f"{old_dir}\n{new_dir}\n{unity_path}\n"
+            # Prepare paths with Windows separators
+            p_old = os.path.normpath(old_dir)
+            p_new = os.path.normpath(new_dir)
+            p_unity = os.path.normpath(unity_path)
+            
+            # Create a temporary batch file to drive the tool reliably with visible CMD
+            bat_path = os.path.join(os.getcwd(), "temp_fix_step.bat")
+            bat_content = f"""@echo off
+(
+echo {p_old}
+echo {p_new}
+echo {p_unity}
+) | "{self.legacy_tool_path}"
+if %errorlevel% neq 0 (
+    echo.
+    echo Tool exited with error code %errorlevel%
+    pause
+)
+"""
             
             try:
+                with open(bat_path, "w") as f:
+                    f.write(bat_content)
+
                 # Run the process in a new console window so user can see it
-                # CREATE_NEW_CONSOLE = 16
                 process = subprocess.Popen(
-                    [self.legacy_tool_path],
-                    stdin=subprocess.PIPE,
-                    stdout=None, # Output to the new console window
-                    stderr=None, # Error to the new console window
-                    text=True, 
-                    bufsize=1,
+                    [bat_path],
                     creationflags=subprocess.CREATE_NEW_CONSOLE
                 )
                 
-                # Send input
-                process.communicate(input=input_str)
+                # Wait for batch file to finish
+                process.wait()
                 
                 if process.returncode != 0:
                     self.log(f"Tool exited with code {process.returncode}")
@@ -436,6 +450,12 @@ class GUIDFixerApp:
                 
             except Exception as e:
                 self.log(f"Error running tool: {e}")
+            finally:
+                if os.path.exists(bat_path):
+                    try:
+                        os.remove(bat_path)
+                    except:
+                        pass
                 
         self.log("All tasks completed.")
         self.btn_run.config(state='normal')
