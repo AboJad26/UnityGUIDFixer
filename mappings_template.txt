@@ -1,0 +1,7 @@
+# Unity GUID Fixer - Batch Mappings File
+# Format: OldFolderPath|NewFolderPath
+# Lines starting with # are comments.
+# Example:
+# C:\Project\Assets\Scripts\OldFolder|C:\Project\Library\PackageCache\com.package\Runtime\NewFolder
+
+# Add your paths below:

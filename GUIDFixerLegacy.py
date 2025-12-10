@@ -153,15 +153,27 @@ class GUIDFixerApp:
     def find_legacy_tool(self):
         # Candidates
         candidates = [
+            # Check relative to current tool folder
             r"GUIDcorrector\ReplaceGUIDwithCorrectOne\x64\Release\ReplaceGUIDwithCorrectOne.exe",
             r"GUIDcorrector\ReplaceGUIDwithCorrectOne\x64\Debug\ReplaceGUIDwithCorrectOne.exe",
-            r"ReplaceGUIDwithCorrectOne.exe"
+            r"ReplaceGUIDwithCorrectOne.exe",
+            # Check sibling folders (if run from UnityGUIDFixerTools inside project root)
+            r"..\GUIDcorrector\ReplaceGUIDwithCorrectOne\x64\Release\ReplaceGUIDwithCorrectOne.exe",
+            r"..\GUIDcorrector\ReplaceGUIDwithCorrectOne\x64\Debug\ReplaceGUIDwithCorrectOne.exe",
+            # Check specific user path structure seen in logs
+            r"C:\Users\aboja\Documents\SpiderFightingFinalVersionIncha2Allah\GUIDcorrector\ReplaceGUIDwithCorrectOne\x64\Release\ReplaceGUIDwithCorrectOne.exe",
+            r"C:\Users\aboja\Documents\SpiderFightingFinalVersionIncha2Allah\GUIDcorrector\ReplaceGUIDwithCorrectOne\x64\Debug\ReplaceGUIDwithCorrectOne.exe"
         ]
         cwd = os.getcwd()
         for c in candidates:
-            full = os.path.join(cwd, c)
+            # Handle absolute paths correctly
+            if os.path.isabs(c):
+                full = c
+            else:
+                full = os.path.join(cwd, c)
+                
             if os.path.exists(full):
-                return full
+                return os.path.normpath(full)
         return None
 
     def browse_unity(self):
